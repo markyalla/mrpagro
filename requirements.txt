@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-Caching
+pandas
+scikit-learn
+Flask-Login
+Werkzeug
+Pillow
+itsdangerous
