@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Management (BOM)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .table th {
+            font-size: 0.9rem;
+        }
+        .table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        .badge-custom {
+            font-size: 0.75rem;
+        }
+        .content-preview {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-dove me-2"></i>Livestock Management (BOM)</h2>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary ">Back</a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+                        <i class="fas fa-plus me-1"></i>Add New Livestock
+                    </button>
+                </div>
+
+                <!-- Alert container -->
+                <div id="alertContainer"></div>
+
+                <!-- Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-dove fa-2x mb-2"></i>
+                                <h5>{{ animals|length }}</h5>
+                                <small>Total Livestock Types</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-wallet fa-2x mb-2"></i>
+                                <h5>GHs{{ "%.2f"|format(animals|sum(attribute='cost_per_unit')|default(0)) }}</h5>
+                                <small>Total Cost Value</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-weight fa-2x mb-2"></i>
+                                <h5>{{ "%.1f"|format(animals|sum(attribute='average_weight')/animals|length if animals else 0) }} kg</h5>
+                                <small>Average Weight</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <i class="fas fa-seedling fa-2x mb-2"></i>
+                                <h5>{{ "%.1f"|format(animals|sum(attribute='feed_requirement')/animals|length if animals else 0) }}</h5>
+                                <small>Avg Feed Requirement</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Livestock Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Housing</th>
+                                        <th>Feed Req.</th>
+                                        <th>Avg Weight</th>
+                                        <th>Cost/Unit</th>
+                                        <th>Feed Type</th>
+                                        <th>Vaccination</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="livestockTableBody">
+                                    {% for animal in animals %}
+                                    <tr data-animal-id="{{ animal.id }}">
+                                        <td>{{ animal.id }}</td>
+                                        <td>
+                                            <span class="badge bg-success badge-custom">{{ animal.name }}</span>
+                                        </td>
+                                        <td>
+                                            <small>{{ animal.housing_per_unit }} {{ animal.housing_unit }}</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ animal.feed_requirement }} kg/day</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ animal.average_weight }} kg</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark">GHs{{ "%.2f"|format(animal.cost_per_unit) }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="content-preview" title="{{ animal.recommended_feed }}">
+                                                {{ animal.recommended_feed[:20] }}{% if animal.recommended_feed|length > 20 %}...{% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="content-preview" title="{{ animal.vaccination_schedule }}">
+                                                {{ animal.vaccination_schedule[:20] }}{% if animal.vaccination_schedule|length > 20 %}...{% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-info view-btn" 
+                                                        data-animal-id="{{ animal.id }}" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning edit-btn" 
+                                                        data-animal-id="{{ animal.id }}" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-btn" 
+                                                        data-animal-id="{{ animal.id }}" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Modal -->
+    <div class="modal fade" id="createModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Livestock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="createName" class="form-label">Animal Name *</label>
+                                    <input type="text" class="form-control" id="createName" name="name" required 
+                                           placeholder="e.g., Chicken, Cow, Goat">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createHousingPerUnit" class="form-label">Housing Per Unit *</label>
+                                    <input type="number" class="form-control" id="createHousingPerUnit" 
+                                           name="housing_per_unit" step="0.01" required placeholder="e.g., 1.5">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createHousingUnit" class="form-label">Housing Unit *</label>
+                                    <select class="form-select" id="createHousingUnit" name="housing_unit" required>
+                                        <option value="">Select Housing Unit</option>
+                                        <option value="sq ft">Square Feet</option>
+                                        <option value="sq m">Square Meters</option>
+                                        <option value="cage">Cage</option>
+                                        <option value="pen">Pen</option>
+                                        <option value="stall">Stall</option>
+                                        <option value="acre">Acre</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createFeedRequirement" class="form-label">Feed Requirement (kg/day) *</label>
+                                    <input type="number" class="form-control" id="createFeedRequirement" 
+                                           name="feed_requirement" step="0.1" required placeholder="e.g., 0.5">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="createAverageWeight" class="form-label">Average Weight (kg) *</label>
+                                    <input type="number" class="form-control" id="createAverageWeight" 
+                                           name="average_weight" step="0.1" required placeholder="e.g., 2.5">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createCostPerUnit" class="form-label">Cost Per Unit (GHs) *</label>
+                                    <input type="number" class="form-control" id="createCostPerUnit" 
+                                           name="cost_per_unit" step="0.01" required placeholder="e.g., 15.99">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createRecommendedFeed" class="form-label">Recommended Feed *</label>
+                                    <textarea class="form-control" id="createRecommendedFeed" name="recommended_feed" 
+                                              rows="3" required placeholder="e.g., Starter feed, grower feed, layer feed"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="createVaccinationSchedule" class="form-label">Vaccination Schedule *</label>
+                                    <textarea class="form-control" id="createVaccinationSchedule" name="vaccination_schedule" 
+                                              rows="3" required placeholder="e.g., Weekly for first month, monthly thereafter"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Add Livestock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Livestock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="editForm">
+                    <input type="hidden" id="editAnimalId" name="animal_id">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editName" class="form-label">Animal Name *</label>
+                                    <input type="text" class="form-control" id="editName" name="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editHousingPerUnit" class="form-label">Housing Per Unit *</label>
+                                    <input type="number" class="form-control" id="editHousingPerUnit" 
+                                           name="housing_per_unit" step="0.01" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editHousingUnit" class="form-label">Housing Unit *</label>
+                                    <select class="form-select" id="editHousingUnit" name="housing_unit" required>
+                                        <option value="">Select Housing Unit</option>
+                                        <option value="sq ft">Square Feet</option>
+                                        <option value="sq m">Square Meters</option>
+                                        <option value="cage">Cage</option>
+                                        <option value="pen">Pen</option>
+                                        <option value="stall">Stall</option>
+                                        <option value="acre">Acre</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editFeedRequirement" class="form-label">Feed Requirement (kg/day) *</label>
+                                    <input type="number" class="form-control" id="editFeedRequirement" 
+                                           name="feed_requirement" step="0.1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editAverageWeight" class="form-label">Average Weight (kg) *</label>
+                                    <input type="number" class="form-control" id="editAverageWeight" 
+                                           name="average_weight" step="0.1" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editCostPerUnit" class="form-label">Cost Per Unit (GHs) *</label>
+                                    <input type="number" class="form-control" id="editCostPerUnit" 
+                                           name="cost_per_unit" step="0.01" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editRecommendedFeed" class="form-label">Recommended Feed *</label>
+                                    <textarea class="form-control" id="editRecommendedFeed" name="recommended_feed" rows="3" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editVaccinationSchedule" class="form-label">Vaccination Schedule *</label>
+                                    <textarea class="form-control" id="editVaccinationSchedule" name="vaccination_schedule" rows="3" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i>Update Livestock
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Modal -->
+    <div class="modal fade" id="viewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Livestock Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Animal Name</h6>
+                                        <h5 class="text-success" id="viewName"></h5>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Average Weight</h6>
+                                        <span class="badge bg-info" id="viewWeight"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Cost Per Unit</h6>
+                                        <span class="badge bg-warning text-dark" id="viewCost"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-home me-2"></i>Housing & Feed</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Housing Requirement</h6>
+                                        <p id="viewHousing"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Daily Feed Requirement</h6>
+                                        <span class="badge bg-secondary" id="viewFeedReq"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Care Instructions</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Recommended Feed</h6>
+                                        <div class="border p-2 rounded bg-light" id="viewRecommendedFeed"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted">Vaccination Schedule</h6>
+                                        <div class="border p-2 rounded bg-light" id="viewVaccination"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this livestock entry?</p>
+                    <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+                    <input type="hidden" id="deleteAnimalId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">
+                        <i class="fas fa-trash me-1"></i>Delete Livestock
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Utility function to show alerts
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Create form submission
+        document.getElementById('createForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/admin/livestock/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
+                    location.reload(); // Refresh to show new livestock
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('An error occurred while creating the livestock.', 'danger');
+            });
+        });
+
+        // Edit button click handler
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const animalId = this.getAttribute('data-animal-id');
+                
+                fetch(`/admin/livestock/${animalId}/edit`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const animal = data.animal;
+                        document.getElementById('editAnimalId').value = animal.id;
+                        document.getElementById('editName').value = animal.name;
+                        document.getElementById('editHousingPerUnit').value = animal.housing_per_unit;
+                        document.getElementById('editHousingUnit').value = animal.housing_unit;
+                        document.getElementById('editFeedRequirement').value = animal.feed_requirement;
+                        document.getElementById('editAverageWeight').value = animal.average_weight;
+                        document.getElementById('editCostPerUnit').value = animal.cost_per_unit;
+                        document.getElementById('editRecommendedFeed').value = animal.recommended_feed;
+                        document.getElementById('editVaccinationSchedule').value = animal.vaccination_schedule;
+                        
+                        new bootstrap.Modal(document.getElementById('editModal')).show();
+                    } else {
+                        showAlert(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error loading livestock data.', 'danger');
+                });
+            });
+        });
+
+        // Edit form submission
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const animalId = document.getElementById('editAnimalId').value;
+            const formData = new FormData(this);
+            
+            fetch(`/admin/livestock/${animalId}/edit`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                    location.reload(); // Refresh to show updated livestock
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('An error occurred while updating the livestock.', 'danger');
+            });
+        });
+
+        // View button click handler
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const animalId = this.getAttribute('data-animal-id');
+                
+                fetch(`/admin/livestock/${animalId}/edit`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const animal = data.animal;
+                        document.getElementById('viewName').textContent = animal.name;
+                        document.getElementById('viewWeight').textContent = animal.average_weight + ' kg';
+                        document.getElementById('viewCost').textContent = 'GHs' + animal.cost_per_unit.toFixed(2);
+                        document.getElementById('viewHousing').textContent = animal.housing_per_unit + ' ' + animal.housing_unit;
+                        document.getElementById('viewFeedReq').textContent = animal.feed_requirement + ' kg/day';
+                        document.getElementById('viewRecommendedFeed').textContent = animal.recommended_feed;
+                        document.getElementById('viewVaccination').textContent = animal.vaccination_schedule;
+                        
+                        new bootstrap.Modal(document.getElementById('viewModal')).show();
+                    } else {
+                        showAlert(data.message, 'danger');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error loading livestock data.', 'danger');
+                });
+            });
+        });
+
+        // Delete button click handler
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const animalId = this.getAttribute('data-animal-id');
+                document.getElementById('deleteAnimalId').value = animalId;
+                new bootstrap.Modal(document.getElementById('deleteModal')).show();
+            });
+        });
+
+        // Confirm delete handler
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            const animalId = document.getElementById('deleteAnimalId').value;
+            
+            fetch(`/admin/livestock/${animalId}/delete`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                    // Remove the row from table
+                    const row = document.querySelector(`tr[data-animal-id="${animalId}"]`);
+                    if (row) row.remove();
+                    // Refresh page to update summary cards
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('An error occurred while deleting the livestock.', 'danger');
+            });
+        });
+
+        // Clear form when create modal is closed
+        document.getElementById('createModal').addEventListener('hidden.bs.modal', function() {
+            document.getElementById('createForm').reset();
+        });
+    </script>
+</body>
+</html>

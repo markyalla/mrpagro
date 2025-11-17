@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Manage Complaints</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container my-4">
+  <h1 class="mb-4">Complaints Management</h1>
+
+  <!-- Display flash messages if any -->
+  {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Create Complaint Button -->
+  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createComplaintModal">
+    Add New Complaint
+  </button>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mb-3">Back</a>
+
+  <!-- Complaints Table -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Supplier</th>
+          <th>Product</th>
+          <th>Rating</th>
+          <th>Complaint Preview</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for complaint in complaints %}
+        <tr>
+          <td>{{ complaint.id }}</td>
+          <td><strong>{{ complaint.user_name }}</strong></td>
+          <td>
+            {{ complaint.supplier_name }}<br>
+            <small class="text-muted">{{ complaint.supplier_phone }}</small>
+          </td>
+          <td>{{ complaint.product_name }}</td>
+          <td>
+            <span class="badge bg-{{ 'danger' if complaint.supplierRating|int <= 2 else 'warning' if complaint.supplierRating|int <= 3 else 'success' }}">
+              {{ complaint.supplierRating }}/5
+            </span>
+          </td>
+          <td>
+            <span class="text-truncate d-inline-block" style="max-width: 200px;">
+              {{ complaint.complaint_text }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#viewComplaintModal{{ complaint.id }}">View</button>
+            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#updateComplaintModal{{ complaint.id }}">Edit</button>
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteComplaintModal{{ complaint.id }}">Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create Complaint Modal -->
+<div class="modal fade" id="createComplaintModal" tabindex="-1" aria-labelledby="createComplaintLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form action="/admin/complaints/create" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createComplaintLabel">Add New Complaint</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">User Name *</label>
+              <input type="text" name="user_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Supplier Name *</label>
+              <input type="text" name="supplier_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Supplier Phone *</label>
+              <input type="text" name="supplier_phone" class="form-control" required maxlength="15">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Product *</label>
+              <select name="product_id" class="form-control" required>
+                <option value="">Select Product</option>
+                {% for product in products %}
+                <option value="{{ product.pid }}">{{ product.productname }} (ID: {{ product.pid }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Product Name *</label>
+              <input type="text" name="product_name" class="form-control" required placeholder="Will auto-fill when product is selected">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Supplier Rating *</label>
+              <select name="supplierRating" class="form-control" required>
+                <option value="">Select Rating</option>
+                <option value="1">1 - Very Poor</option>
+                <option value="2">2 - Poor</option>
+                <option value="3">3 - Average</option>
+                <option value="4">4 - Good</option>
+                <option value="5">5 - Excellent</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Complaint Details *</label>
+          <textarea name="complaint_text" class="form-control" rows="5" required placeholder="Describe the complaint in detail..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Complaint</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Generate View, Update, and Delete modals for each complaint -->
+{% for complaint in complaints %}
+
+<!-- View Complaint Modal for Complaint {{ complaint.id }} -->
+<div class="modal fade" id="viewComplaintModal{{ complaint.id }}" tabindex="-1" aria-labelledby="viewComplaintLabel{{ complaint.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewComplaintLabel{{ complaint.id }}">Complaint Details - ID #{{ complaint.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2 mb-3">User Information</h6>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Complaint ID:</strong></div>
+              <div class="col-8">{{ complaint.id }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>User Name:</strong></div>
+              <div class="col-8">{{ complaint.user_name }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2 mb-3">Supplier Information</h6>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Supplier Name:</strong></div>
+              <div class="col-8">{{ complaint.supplier_name }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Supplier Phone:</strong></div>
+              <div class="col-8">{{ complaint.supplier_phone }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Rating Given:</strong></div>
+              <div class="col-8">
+                <span class="badge bg-{{ 'danger' if complaint.supplierRating|int <= 2 else 'warning' if complaint.supplierRating|int <= 3 else 'success' }} fs-6">
+                  {{ complaint.supplierRating }}/5
+                  {% if complaint.supplierRating|int <= 2 %}
+                    (Very Poor/Poor)
+                  {% elif complaint.supplierRating|int <= 3 %}
+                    (Average)
+                  {% else %}
+                    (Good/Excellent)
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">Product Information</h6>
+            <div class="row mb-2">
+              <div class="col-3"><strong>Product Name:</strong></div>
+              <div class="col-9">{{ complaint.product_name }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-3"><strong>Product ID:</strong></div>
+              <div class="col-9">{{ complaint.product_id }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">Complaint Details</h6>
+            <div class="card">
+              <div class="card-body">
+                <p class="card-text">{{ complaint.complaint_text }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Complaint Modal for Complaint {{ complaint.id }} -->
+<div class="modal fade" id="updateComplaintModal{{ complaint.id }}" tabindex="-1" aria-labelledby="updateComplaintLabel{{ complaint.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form action="/admin/complaints/edit/{{ complaint.id }}" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateComplaintLabel{{ complaint.id }}">Update Complaint - ID #{{ complaint.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">User Name *</label>
+              <input type="text" name="user_name" class="form-control" value="{{ complaint.user_name }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Supplier Name *</label>
+              <input type="text" name="supplier_name" class="form-control" value="{{ complaint.supplier_name }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Supplier Phone *</label>
+              <input type="text" name="supplier_phone" class="form-control" value="{{ complaint.supplier_phone }}" required maxlength="15">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Product *</label>
+              <select name="product_id" class="form-control" required>
+                {% for product in products %}
+                <option value="{{ product.pid }}" {{ 'selected' if product.pid == complaint.product_id }}>{{ product.productname }} (ID: {{ product.pid }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Product Name *</label>
+              <input type="text" name="product_name" class="form-control" value="{{ complaint.product_name }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Supplier Rating *</label>
+              <select name="supplierRating" class="form-control" required>
+                <option value="1" {{ 'selected' if complaint.supplierRating == '1' }}>1 - Very Poor</option>
+                <option value="2" {{ 'selected' if complaint.supplierRating == '2' }}>2 - Poor</option>
+                <option value="3" {{ 'selected' if complaint.supplierRating == '3' }}>3 - Average</option>
+                <option value="4" {{ 'selected' if complaint.supplierRating == '4' }}>4 - Good</option>
+                <option value="5" {{ 'selected' if complaint.supplierRating == '5' }}>5 - Excellent</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Complaint Details *</label>
+          <textarea name="complaint_text" class="form-control" rows="5" required>{{ complaint.complaint_text }}</textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Complaint</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Complaint Modal for Complaint {{ complaint.id }} -->
+<div class="modal fade" id="deleteComplaintModal{{ complaint.id }}" tabindex="-1" aria-labelledby="deleteComplaintLabel{{ complaint.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteComplaintLabel{{ complaint.id }}">Delete Complaint</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <strong>Warning:</strong> This action cannot be undone!
+        </div>
+        <p>Are you sure you want to delete the following complaint?</p>
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">Complaint ID: {{ complaint.id }}</h6>
+            <p class="card-text">
+              <strong>User:</strong> {{ complaint.user_name }}<br>
+              <strong>Supplier:</strong> {{ complaint.supplier_name }}<br>
+              <strong>Product:</strong> {{ complaint.product_name }}<br>
+              <strong>Rating:</strong> {{ complaint.supplierRating }}/5<br>
+              <strong>Preview:</strong> {{ complaint.complaint_text[:100] }}{% if complaint.complaint_text|length > 100 %}...{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="/admin/complaints/delete/{{ complaint.id }}" class="btn btn-danger">Delete Complaint</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Optional: Auto-fill product name when product is selected -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-fill product name in create modal
+    const createProductSelect = document.querySelector('#createComplaintModal select[name="product_id"]');
+    const createProductNameInput = document.querySelector('#createComplaintModal input[name="product_name"]');
+    
+    if (createProductSelect && createProductNameInput) {
+        createProductSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                const productName = selectedOption.text.split(' (ID:')[0];
+                createProductNameInput.value = productName;
+            } else {
+                createProductNameInput.value = '';
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>

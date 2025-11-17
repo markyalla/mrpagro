@@ -1,0 +1,198 @@
+<!DOCTYPE html>  
+<html lang="en">  
+
+<head>  
+  <meta charset="utf-8">  
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">  
+
+  <title>{% block title %}  
+  {% endblock title %}</title>  
+  <meta content="" name="description">  
+  <meta content="" name="keywords">  
+
+  {% block style %}  
+  {% endblock style %}  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Raleway:300,400,500,700,800"  
+    rel="stylesheet">  
+
+  <!-- Bootstrap 5.3.3 CSS (CURRENT VERSION) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <!-- Font Awesome 6.5.1 (CURRENT VERSION) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+
+  <!-- Other Vendor CSS Files -->  
+  <link href="static/assets/vendor/venobox/venobox.css" rel="stylesheet">  
+  <link href="static/assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">  
+  <link href="static/assets/vendor/aos/aos.css" rel="stylesheet">   
+
+  <!-- Template Main CSS File -->  
+  <link href="static/assets/css/style.css" rel="stylesheet">  
+
+  
+
+</head>  
+
+<body>  
+
+  <!-- ======= Header ======= -->  
+  <header id="header">  
+    <div class="container">  
+
+       
+
+      <!-- ✅ FIXED NAVBAR -->
+      <nav id="nav-menu-container">  
+        <ul class="nav-menu">  
+          <li class="{% block home %} {% endblock home %}"><a href="/"><i class="fas fa-home"></i> Home</a></li>  
+          <li class="{% block forum%} {% endblock forum %}"><a href="/forum"><i class="fas fa-comments"></i> Community Forum</a></li>  
+          <li class="{% block bom %} {% endblock bom %}"><a href="/bom"><i class="fas fa-calculator"></i> BOM</a></li>  
+          <li class="{% block addagroproducts %} {% endblock addagroproducts %}"><a href="/addagroproducts"><i class="fas fa-plus"></i> Add Products</a></li>  
+          <li class="{% block agroproducts %} {% endblock agroproducts %}"><a href="/agroproducts"><i class="fas fa-leaf"></i> Agro Products</a></li>  
+            
+          <!-- Search Form -->
+          <li class="search-form-container">  
+            <form action="/search" method="GET" class="d-flex" id="searchForm">  
+              <input type="text" name="query" id="searchInput" class="form-control form-control-sm me-1" placeholder="Search..." style="min-width: 120px;">
+              <button type="button" id="voiceSearchButton" class="btn btn-primary btn-sm">🔊</button>  
+            </form>  
+          </li>  
+
+          {% if current_user.is_authenticated %}  
+          <li class="buy-tickets"><a href="/profile" data-bs-toggle="modal" data-bs-target="#profileModal" id="profileLink" class="text-primary">
+            <i class="fas fa-user me-1"></i>Welcome {{current_user.username}}
+          </a></li>  
+          <li class="buy-tickets"><a href="/logout" class="text-danger"><i class="fas fa-sign-out-alt me-1"></i>Logout</a></li>  
+          {% else %}  
+          <li class="buy-tickets"><a href="/login" class="text-primary"><i class="fas fa-sign-in-alt me-1"></i>Signin</a></li>  
+          {% endif %}  
+        </ul>  
+      </nav><!-- #nav-menu-container -->  
+    </div>  
+  </header><!-- End Header -->  
+
+  <!-- ======= Intro Section ======= -->  
+  <section id="intro">  
+    <div class="intro-container" data-aos="zoom-in" data-aos-delay="100">  
+      <h1 class="mb-4 pb-0">MATERIAL REQUIREMENT PLANNING</h1>  
+      <p class="mb-4 pb-0">AGROBUSINESS</p>  
+      <a href="/agroproducts" class="about-btn scrollto">AGRO PRODUCTS</a>  
+    </div>  
+  </section><!-- End Intro Section -->  
+  <main id="main">  
+
+    {% block body %}  
+    {% with messages=get_flashed_messages(with_categories=true) %}  
+    {% if messages %}  
+    {% for category, message in messages %}  
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">  
+      {{message}}  
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>  
+    {% endfor %}  
+    {% endif %}  
+    {% endwith %}  
+    {% endblock body %}  
+
+    <a href="#" class="back-to-top"><i class="fa fa-angle-up"></i></a>  
+
+  </main>
+
+  <!-- Profile Modal (Bootstrap 5) -->
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">  
+    <div class="modal-dialog">  
+      <div class="modal-content">  
+        <div class="modal-header">  
+          <h5 class="modal-title" id="profileModalLabel">Profile</h5>  
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>  
+        <div class="modal-body">  
+          <div id="profileContent">  
+            <!-- Profile content will be loaded here -->  
+          </div>  
+        </div>  
+        <div class="modal-footer">  
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>  
+        </div>  
+      </div>  
+    </div>  
+  </div>  
+
+  <!-- Modern Scripts (CURRENT VERSIONS) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>  
+  <script src="static/assets/vendor/php-email-form/validate.js"></script>  
+  <script src="static/assets/vendor/venobox/venobox.min.js"></script>  
+  <script src="static/assets/vendor/owl.carousel/owl.carousel.min.js"></script>  
+  <script src="static/assets/vendor/superfish/superfish.min.js"></script>  
+  <script src="static/assets/vendor/hoverIntent/hoverIntent.js"></script>  
+  <script src="static/assets/vendor/aos/aos.js"></script>  
+  <script src="static/assets/js/main.js"></script>  
+
+  <!-- FIXED Custom Scripts -->
+  <script>
+    // Initialize AOS
+    AOS.init();
+
+    // Voice Search
+    const searchInput = document.getElementById('searchInput');  
+    const voiceSearchButton = document.getElementById('voiceSearchButton');  
+    const searchForm = document.getElementById('searchForm');  
+
+    if ('webkitSpeechRecognition' in window) {  
+      const recognition = new webkitSpeechRecognition();  
+      recognition.continuous = false;  
+      recognition.interimResults = false;  
+      recognition.lang = 'en-US';  
+
+      voiceSearchButton.addEventListener('click', () => {  
+        recognition.start();  
+        voiceSearchButton.innerHTML = '🎤 Listening...';  
+        voiceSearchButton.disabled = true;
+      });  
+
+      recognition.onresult = (event) => {  
+        const transcript = event.results[0][0].transcript;  
+        searchInput.value = transcript;  
+        searchForm.submit();  
+      };  
+
+      recognition.onerror = (event) => {  
+        voiceSearchButton.innerHTML = '🔊';  
+        voiceSearchButton.disabled = false;
+      };  
+
+      recognition.onend = () => {  
+        voiceSearchButton.innerHTML = '🔊';  
+        voiceSearchButton.disabled = false;
+      };  
+    } else {  
+      voiceSearchButton.disabled = true;  
+      voiceSearchButton.innerHTML = '🚫';  
+    }    
+
+    // Profile Modal AJAX
+    $(document).ready(function() {  
+      $('#profileLink').on('click', function(e) {  
+        e.preventDefault();  
+        $.ajax({  
+          url: '/profile',  
+          type: 'GET',  
+          success: function(data) {  
+            $('#profileContent').html(data);  
+            var profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+            profileModal.show();
+          },  
+          error: function() {  
+            $('#profileContent').html('<div class="alert alert-danger">Error loading profile.</div>');  
+            var profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+            profileModal.show();
+          }  
+        });  
+      });  
+    });
+  </script>  
+    
+</body>  
+</html>

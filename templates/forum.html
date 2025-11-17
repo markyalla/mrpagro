@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Community Forum{% endblock title %}
+
+{% block forum %}menu-active{% endblock forum %}
+
+{% block body %}
+<section id="forum-section" class="section-with-bg">
+    <div class="container mt-5">
+        <h1 class="text-center">Community Forum</h1>
+
+        <div class="container mt-4">
+            <p>Share your farming experiences and learn from others</p>
+
+            <!-- Add Discussion Button (Triggers the Modal) -->
+            <div class="container">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newPostModal">
+                    Add Discussion
+                </button>
+            </div>
+
+            <!-- New Post Modal -->
+            <div class="modal fade" id="newPostModal" tabindex="-1" role="dialog" aria-labelledby="newPostModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="newPostModalLabel">New Discussion</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" action="{{ url_for('forum') }}">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" class="form-control" id="title" name="title" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Content</label>
+                                    <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Post Discussion</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <!-- Existing Posts -->
+            {% for post in posts %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text">{{ post.content }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Posted by {{ post.author.username }} on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                            </small>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="mt-3">
+                            <h6>Comments:</h6>
+                            {% for comment in post.comments %}
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <p class="card-text">{{ comment.content }}</p>
+                                        <small class="text-muted">
+                                            By {{ comment.author.username }} on {{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                        </small>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            <!-- New Comment Form -->
+                            <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}">
+                                <div class="mb-3">
+                                    <label for="comment_content" class="form-label">Add a Comment</label>
+                                    <textarea class="form-control" id="comment_content" name="comment_content" rows="2" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary">Post Comment</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock body %}

@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Manage Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container my-4">
+  <h1 class="mb-4">Product Management</h1>
+
+  <!-- Display flash messages if any -->
+  {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Create Product Button -->
+  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createProductModal">
+    Add New Product
+  </button>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mb-3">Back</a>
+
+  <!-- Products Table -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Product Name</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Supplier</th>
+          <th>Contact</th>
+          <th>Recommend</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>{{ p.pid }}</td>
+          <td>
+            <strong>{{ p.productname }}</strong>
+            {% if p.product_picture %}
+            <br><small class="text-muted">📷 Has Image</small>
+            {% endif %}
+          </td>
+          <td>GHs{{ p.price }}</td>
+          <td>
+            <span class="badge bg-{{ 'success' if p.status == 'available' else 'secondary' }}">
+              {{ p.status|title }}
+            </span>
+          </td>
+          <td>{{ p.supplier.username if p.supplier else p.username }}</td>
+          <td>
+            <small>{{ p.email }}<br>{{ p.phone }}</small>
+          </td>
+          <td>
+            <span class="badge bg-{{ 'warning' if p.recommend == 'recommended' else 'light text-dark' }}">
+              {{ p.recommend|title if p.recommend else 'No' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#viewProductModal{{ p.pid }}">View</button>
+            <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#updateProductModal{{ p.pid }}">Edit</button>
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteProductModal{{ p.pid }}">Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Create Product Modal -->
+<div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form action="/admin/products/create" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createProductLabel">Add New Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Product Name *</label>
+              <input type="text" name="productname" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Price *</label>
+              <input type="number" name="price" class="form-control" required min="0" step="0.01">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-control">
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
+                <option value="pending">Pending</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Supplier *</label>
+              <select name="supplier_id" class="form-control" required>
+                <option value="">Select Supplier</option>
+                {% for user in users %}
+                  {% if user.is_supplier %}
+                  <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Contact Email</label>
+              <input type="email" name="email" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Contact Phone</label>
+              <input type="text" name="phone" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Product Description</label>
+          <textarea name="productdesc" class="form-control" rows="3" maxlength="300"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Product Picture URL</label>
+          <input type="text" name="product_picture" class="form-control">
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="recommend" id="createRecommend">
+          <label class="form-check-label" for="createRecommend">Recommend this product</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Generate View, Update, and Delete modals for each product -->
+{% for p in products %}
+
+<!-- View Product Modal for Product {{ p.pid }} -->
+<div class="modal fade" id="viewProductModal{{ p.pid }}" tabindex="-1" aria-labelledby="viewProductLabel{{ p.pid }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewProductLabel{{ p.pid }}">Product Details - {{ p.productname }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row mb-2">
+              <div class="col-4"><strong>Product ID:</strong></div>
+              <div class="col-8">{{ p.pid }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Name:</strong></div>
+              <div class="col-8">{{ p.productname }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Price:</strong></div>
+              <div class="col-8">${{ p.price }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Status:</strong></div>
+              <div class="col-8">
+                <span class="badge bg-{{ 'success' if p.status == 'available' else 'secondary' }}">
+                  {{ p.status|title }}
+                </span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Recommended:</strong></div>
+              <div class="col-8">
+                <span class="badge bg-{{ 'warning' if p.recommend == 'recommended' else 'light text-dark' }}">
+                  {{ p.recommend|title if p.recommend else 'No' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="row mb-2">
+              <div class="col-4"><strong>Supplier:</strong></div>
+              <div class="col-8">{{ p.supplier.username if p.supplier else p.username or 'N/A' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Contact Email:</strong></div>
+              <div class="col-8">{{ p.email or 'N/A' }}</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-4"><strong>Contact Phone:</strong></div>
+              <div class="col-8">{{ p.phone or 'N/A' }}</div>
+            </div>
+          </div>
+        </div>
+        {% if p.productdesc %}
+        <div class="row mb-2">
+          <div class="col-12">
+            <strong>Description:</strong>
+            <p class="mt-2">{{ p.productdesc }}</p>
+          </div>
+        </div>
+        {% endif %}
+        {% if p.product_picture %}
+        <div class="row mb-2">
+          <div class="col-12">
+            <strong>Product Image:</strong>
+            <div class="mt-2">
+
+              <img src="{{ url_for('uploaded_file', filename=p.product_picture) }}" 
+                   alt="Product Picture" 
+                   class="img-thumbnail" 
+                   style="max-width: 150px; max-height: 150px; object-fit: cover;">
+              <br><small class="text-muted">{{ p.product_picture }}</small>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Product Modal for Product {{ p.pid }} -->
+<div class="modal fade" id="updateProductModal{{ p.pid }}" tabindex="-1" aria-labelledby="updateProductLabel{{ p.pid }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <form action="/admin/products/edit/{{ p.pid }}" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateProductLabel{{ p.pid }}">Update Product - {{ p.productname }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Product Name *</label>
+              <input type="text" name="productname" class="form-control" value="{{ p.productname }}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Price *</label>
+              <input type="number" name="price" class="form-control" value="{{ p.price }}" required min="0" step="0.01">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Status</label>
+              <select name="status" class="form-control">
+                <option value="available" {{ 'selected' if p.status == 'available' }}>Available</option>
+                <option value="sold" {{ 'selected' if p.status == 'sold' }}>Sold</option>
+                <option value="pending" {{ 'selected' if p.status == 'pending' }}>Pending</option>
+                <option value="inactive" {{ 'selected' if p.status == 'inactive' }}>Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Supplier *</label>
+              <select name="supplier_id" class="form-control" required>
+                {% for user in users %}
+                  {% if user.is_supplier %}
+                  <option value="{{ user.id }}" {{ 'selected' if user.id == p.supplier_id }}>{{ user.username }} ({{ user.email }})</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Contact Email</label>
+              <input type="email" name="email" class="form-control" value="{{ p.email or '' }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Contact Phone</label>
+              <input type="text" name="phone" class="form-control" value="{{ p.phone or '' }}">
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Product Description</label>
+          <textarea name="productdesc" class="form-control" rows="3" maxlength="300">{{ p.productdesc or '' }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Product Picture URL</label>
+          <input type="text" name="product_picture" class="form-control" value="{{ p.product_picture or '' }}">
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="recommend" id="updateRecommend{{ p.pid }}" {{ 'checked' if p.recommend == 'recommended' }}>
+          <label class="form-check-label" for="updateRecommend{{ p.pid }}">Recommend this product</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Product Modal for Product {{ p.pid }} -->
+<div class="modal fade" id="deleteProductModal{{ p.pid }}" tabindex="-1" aria-labelledby="deleteProductLabel{{ p.pid }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteProductLabel{{ p.pid }}">Delete Product</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <strong>Warning:</strong> This action cannot be undone!
+        </div>
+        <p>Are you sure you want to delete the following product?</p>
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">{{ p.productname }}</h6>
+            <p class="card-text">
+              <strong>ID:</strong> {{ p.pid }}<br>
+              <strong>Price:</strong> ${{ p.price }}<br>
+              <strong>Supplier:</strong> {{ p.supplier.username if p.supplier else p.username or 'N/A' }}<br>
+              <strong>Status:</strong> {{ p.status|title }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="/admin/products/delete/{{ p.pid }}" class="btn btn-danger">Delete Product</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% extends 'auth.html' %}
+{% block title %}
+Signup
+
+{% endblock title %}
+{% block content %}
+<br>
+ <h3 class="mb-1"><span>Sign Up</span> </h3>
+  
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+
+<div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+    {{message}}
+
+
+</div>
+
+
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+<div>  
+<form class="text-white py-1 px-1" action="/signup" method="post" enctype="multipart/form-data">
+ <div class="form-group">
+  <label for="exampleInputUsername1">Username</label>
+    <input type="text" class="form-control mb-2" name="username" id="username" required >
+  </div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Email address</label>
+    <input type="email" class="form-control mb-2" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" required>
+    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPhone1">Phone</label>
+    <input type="phone" class="form-control mb-2" id="exampleInputPhone1" name="phone" aria-describedby="phone" placeholder="+233 is required" required>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputLocation1">Location</label>
+    <input type="text" class="form-control mb-2" id="exampleInputPhone1" name="location" aria-describedby="location" required>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="password" class="form-control mb-2" name="password" id="exampleInputPassword1" required>
+  </div>
+  <div class="form-group">  
+    <input type="checkbox" class="form-check-input" id="is_supplier" name="is_supplier">  
+    <label class="form-check-label" for="is_supplier">Register as Supplier</label>  
+  </div>
+  <div class="form-group"> 
+    <label for="profile_picture">Profile Picture:</label>  
+    <input type="file" class="for mb-2" name="profile_picture" accept="image/*" required>  
+    
+  </div>
+  <button type="submit" class="form-control bg-success text-white">Signup</button>
+      <a href="/login" class="about-btn scrollto">Login</a>
+    
+</form>
+<br>
+<br>
+<br>
+<br>
+</div>
+     
+{% endblock content %}

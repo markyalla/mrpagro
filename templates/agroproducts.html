@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}
+Agro Products
+{% endblock title %}
+
+{% block agroproducts %}menu-active{% endblock agroproducts %}
+
+{% block body %}
+ <h3 class="text-center"><span>Agro Products</span> </h3>
+  
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+<br>
+
+<div class="container mt-3">
+<div class="row">
+
+  {% for p in query %}
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-body">
+        <img src="{{ url_for('uploaded_file', filename=p.product_picture) }}"   
+        alt="Profile Picture"   
+        class="profile-picture" style="max-width: 100%; height: auto;">  
+       <br>
+        <b><h5 class="card-title">{{p.productname}}</h5></b>
+        <b>Price : {{p.price}}</b>
+        <hr>
+        <p class="card-text">{{p.productdesc}}</p>
+        
+ 
+        <p>Owner : {{p.username}}</p>
+        <p>phone : {{p.phone}}</p>
+        <p>Email : {{p.email}}</p>
+        <hr>
+        <div class="button-group d-flex align-items-center gap-2">
+          <span class="btn btn-primary">Status: {{ p.status }}</span>
+          <a href="" class="btn btn-primary">Recommended: {{ p.recommend }}</a>
+        </div>
+      
+
+        <hr>
+        <div class="button-group">  
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{p.email}}" target="_blank" class="btn btn-success">Mail</a>  
+          <a href="{{ url_for('complaint', product_id=p.pid) }}" class="btn btn-danger">File a Complaint</a>   
+          <a href="https://wa.me/{{ p.phone }}?text=Hello%20I%20would%20like%20to%20purchase" target="_blank" class="btn btn-success">Chat</a>
+        </div> 
+        
+      </div>
+    </div>
+  </div>
+ 
+  {% endfor %}
+</div>
+  
+<hr>
+</div>
+{% endblock body %}

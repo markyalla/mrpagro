@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Manage Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container my-4">
+  <h1 class="mb-4">User Management</h1>
+
+  <!-- Display flash messages if any -->
+  {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Create User Button -->
+  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createUserModal">
+    Create User
+  </button>
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary mb-3">Back</a>
+
+  <!-- Users Table -->
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Location</th>
+        <th>Supplier</th>
+        <th>Admin</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="usersTableBody">
+      {% for u in users %}
+      <tr data-user-id="{{ u.id }}">
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.phone }}</td>
+        <td>{{ u.location }}</td>
+        <td>{{ 'Yes' if u.is_supplier else 'No' }}</td>
+        <td>{{ 'Yes' if u.is_admin else 'No' }}</td>
+        <td>
+          <button class="btn btn-sm btn-info me-1" data-bs-toggle="modal" data-bs-target="#viewUserModal{{ u.id }}">View</button>
+          <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#updateUserModal{{ u.id }}">Edit</button>
+          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal{{ u.id }}">Delete</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Create User Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="/admin/users/create" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createUserLabel">Create User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Username *</label>
+          <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email *</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="is_supplier" id="createIsSupplier">
+          <label class="form-check-label" for="createIsSupplier">Is Supplier</label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="is_admin" id="createIsAdmin">
+          <label class="form-check-label" for="createIsAdmin">Is Admin</label>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Profile Picture URL</label>
+          <input type="text" name="profile_picture" class="form-control">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Generate View, Update, and Delete modals for each user -->
+{% for u in users %}
+
+<!-- View User Modal for User {{ u.id }} -->
+<div class="modal fade" id="viewUserModal{{ u.id }}" tabindex="-1" aria-labelledby="viewUserLabel{{ u.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewUserLabel{{ u.id }}">View User - {{ u.username }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-2">
+          <div class="col-4"><strong>ID:</strong></div>
+          <div class="col-8">{{ u.id }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Username:</strong></div>
+          <div class="col-8">{{ u.username }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Email:</strong></div>
+          <div class="col-8">{{ u.email }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Phone:</strong></div>
+          <div class="col-8">{{ u.phone or 'N/A' }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Location:</strong></div>
+          <div class="col-8">{{ u.location or 'N/A' }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Supplier:</strong></div>
+          <div class="col-8">{{ 'Yes' if u.is_supplier else 'No' }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Admin:</strong></div>
+          <div class="col-8">{{ 'Yes' if u.is_admin else 'No' }}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-4"><strong>Profile Picture:</strong></div>
+          <div class="col-8">
+            {% if u.profile_picture %}
+              <img src="{{ url_for('uploaded_file', filename=u.profile_picture) }}" 
+                    alt="Profile Picture" 
+                    class="img-thumbnail" 
+                    style="max-width: 150px; max-height: 150px; object-fit: cover;">
+            {% else %}
+              <img src="{{ url_for('static', filename='images/default-avatar.png') }}" 
+                   alt="No Profile Picture" 
+                   class="img-thumbnail" 
+                   style="max-width: 150px; max-height: 150px; object-fit: cover;">
+              <br><small class="text-muted">No profile picture</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update User Modal for User {{ u.id }} -->
+<div class="modal fade" id="updateUserModal{{ u.id }}" tabindex="-1" aria-labelledby="updateUserLabel{{ u.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="/admin/users/edit/{{ u.id }}" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="updateUserLabel{{ u.id }}">Update User - {{ u.username }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Username *</label>
+          <input type="text" name="username" class="form-control" value="{{ u.username }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email *</label>
+          <input type="email" name="email" class="form-control" value="{{ u.email }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" class="form-control" value="{{ u.phone or '' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" class="form-control" value="{{ u.location or '' }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">New Password (leave blank to keep current)</label>
+          <input type="password" name="password" class="form-control">
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="is_supplier" id="updateIsSupplier{{ u.id }}" {{ 'checked' if u.is_supplier }}>
+          <label class="form-check-label" for="updateIsSupplier{{ u.id }}">Is Supplier</label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="is_admin" id="updateIsAdmin{{ u.id }}" {{ 'checked' if u.is_admin }}>
+          <label class="form-check-label" for="updateIsAdmin{{ u.id }}">Is Admin</label>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Profile Picture URL</label>
+          <input type="text" name="profile_picture" class="form-control" value="{{ u.profile_picture or '' }}">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update User</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete User Modal for User {{ u.id }} -->
+<div class="modal fade" id="deleteUserModal{{ u.id }}" tabindex="-1" aria-labelledby="deleteUserLabel{{ u.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserLabel{{ u.id }}">Delete User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <strong>Warning:</strong> This action cannot be undone!
+        </div>
+        <p>Are you sure you want to delete the following user?</p>
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">{{ u.username }}</h6>
+            <p class="card-text">
+              <strong>ID:</strong> {{ u.id }}<br>
+              <strong>Email:</strong> {{ u.email }}<br>
+              <strong>Role:</strong> 
+              {% if u.is_admin %}Admin{% elif u.is_supplier %}Supplier{% else %}Regular User{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="/admin/users/delete/{{ u.id }}" class="btn btn-danger">Delete User</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

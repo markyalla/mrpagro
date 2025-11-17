@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Submit Complaint</title>  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
+</head>  
+<body>  
+<div class="container mt-5">
+  <h2>Search Result</h2>
+    <div class="row"> 
+        {% if products %}  
+            {% for product in products %} 
+            <div class="col-sm-4">
+                <div class="card">
+                  <div class="card-body">
+                    <img src="{{ url_for('uploaded_file', filename=product.product_picture) }}"   
+                      alt="Profile Picture"   
+                      class="profile-picture">
+                    <b><h5 class="card-title">{{product.productname}}</h5></b>
+                    <b>Price : {{product.price}}</b>
+                    <hr>
+                    <p class="card-text">{{product.productdesc}}</p>
+                    
+             
+                    <p>Owner : {{product.username}}</p>
+                    <p>phone : {{product.phone}}</p>
+                    <p>Email : {{product.email}}</p>
+                    <hr>
+                    <div class="button-group">
+                      <label class="btn btn-primary">{{product.status}}</label>
+                        
+                      <a href="" class="btn btn-primary">{{product.recommend}}</a>
+                    </div>
+                  
+            
+                    <hr>
+                    <div class="button-group">  
+                      <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to={{product.email}}" target="_blank" class="btn btn-success">Purchase</a>  
+                      <a href="{{ url_for('complaint', product_id=product.pid) }}" class="btn btn-danger">File a Complaint</a>  
+                      <a href="https://wa.me/{{product.phone}}" target="_blank" class="btn btn-success">Chat</a>  
+                    </div> 
+                    
+                  </div>
+                </div>
+              </div>  
+            {% endfor %}  
+        {% else %}  
+            <p>No products found.</p>  
+        {% endif %}  
+     </ul>
+    </div>
+    
+</div>  
+
+<!-- Bootstrap JS and dependencies (optional) -->  
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>  
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>  
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+</body>  
+</html>  

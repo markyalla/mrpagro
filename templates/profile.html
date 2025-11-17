@@ -1,0 +1,96 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>User Profile</title>  
+    <style>  
+        .profile-picture {  
+            width: 150px;  
+            height: 150px;  
+            border-radius: 50%; /* Circular shape */  
+            object-fit: cover; /* Ensure image fits nicely */  
+            border: 4px solid #007bff; /* Blue border for style */
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="container mt-5">  
+        <h1 class="mb-4">Your Profile</h1>  
+        <div class="text-center">  
+            <img src="{{ url_for('uploaded_file', filename=user.profile_picture) }}"   
+                 alt="Profile Picture"   
+                 class="profile-picture mb-3">  
+            <br>  
+            <h2>{{ user.username }}</h2>  
+            <p class="lead"><i class="fas fa-envelope text-primary"></i> Email: {{ user.email }}</p>  
+            <p class="lead"><i class="fas fa-phone text-success"></i> Phone: {{ user.phone }}</p>  
+            <p class="lead"><i class="fas fa-map-marker-alt text-info"></i> Location: {{ user.location }}</p>  
+            <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
+                <i class="fas fa-edit me-2"></i>Update Profile
+            </button>  
+        </div>  
+    </div>  
+
+    <!-- Update Profile Modal (Bootstrap 5) -->  
+    <div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel" aria-hidden="true">  
+        <div class="modal-dialog modal-lg">  
+            <div class="modal-content">  
+                <div class="modal-header">  
+                    <h5 class="modal-title" id="updateProfileModalLabel">
+                        <i class="fas fa-user-edit me-2"></i>Update Profile
+                    </h5>  
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>  
+                <form action="{{ url_for('update_profile_picture') }}" method="POST" enctype="multipart/form-data"> 
+                    <div class="modal-body">  
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fas fa-user me-2"></i>Username</label>
+                                <input type="text" name="username" class="form-control" placeholder="Username" value="{{ user.username }}" required>  
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fas fa-envelope me-2"></i>Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="Email" value="{{ user.email }}" required>  
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fas fa-phone me-2"></i>Phone</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="Phone" value="{{ user.phone }}" required>  
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fas fa-map-marker-alt me-2"></i>Location</label>
+                                <input type="text" name="location" class="form-control" placeholder="Location" value="{{ user.location }}" required>  
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-image me-2"></i>Profile Picture</label>
+                            <input type="file" name="profile_picture" class="form-control" accept="image/*">  
+                            <small class="text-muted">Upload a new profile picture (optional)</small>
+                        </div>  
+                    </div>  
+                    <div class="modal-footer">  
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>  
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Profile
+                        </button>  
+                    </div>  
+                </form>  
+            </div>  
+        </div>  
+    </div>  
+
+    <!-- ✅ CURRENT SCRIPTS (MATCHES BASE.HTML) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" integrity="sha512-+zoMPO3PIgzILxEs5K0gAmOIzvS7m4dWoMRQ==" crossorigin="anonymous"></script>
+
+    <script>
+        // Auto-close alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+</body>  
+</html>

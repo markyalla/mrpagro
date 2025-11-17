@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Bill Of Material{% endblock title %}
+
+{% block bom %}menu-active{% endblock bom %}
+
+{% block body %}
+<section id="bom-section" class="section-with-bg">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Bill Of Material</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Crop Calculator</h3>
+                <form method="POST" action="{{ url_for('bom') }}" class="mt-4">
+                    <input type="hidden" name="farming_type" value="crops">
+                    <br>
+                    <div class="form-group">
+                        <label for="hectares">Enter number of hectares:</label>
+                        <input type="number" id="hectares" name="hectares" class="form-control" required>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="product">Select a product:</label>
+                        <select id="product" name="product" class="form-control" required>
+                            {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }} - GHs{{ product.price_per_seedling }} per one ({{ product.seedlings_per_hectare }} seedlings/hectare)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary btn-block">Calculate Crops</button>
+                    <br>
+                </form>
+                <br>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Livestock Calculator</h3>
+                <form method="POST" action="{{ url_for('bom') }}" class="mt-4">
+                    <input type="hidden" name="farming_type" value="livestock">
+                    <br>
+                    <div class="form-group">
+                        <label for="animal_type">Select Animal Type:</label>
+                        <select id="animal_type" name="animal_type" class="form-control" required>
+                            {% for animal in animals %}
+                                <option value="{{ animal.id }}">{{ animal.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+
+                    <div class="form-group">
+                        <label for="quantity">Number of Animals:</label>
+                        <input type="number" id="quantity" name="quantity" class="form-control" min="1" required>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary btn-block">Calculate Livestock</button>
+                    <br>
+                </form>
+            </div>
+        </div>
+
+        {% if total_price %}
+            <div class="alert alert-success mt-4">
+                <h2>Crop Calculation Results:</h2>
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr><th>Hectares</th><td>{{ hectares }}</td></tr>
+                        <tr><th>Product</th><td>{{ selected_product.name }}</td></tr>
+                        <tr><th>Total Seedlings</th><td>{{ total_seedlings }}</td></tr>
+                        <tr><th>Total Price</th><td>GHs{{ "%.2f"|format(total_price) }}</td></tr>
+                        <tr><th>Planting Interval</th><td>{{ selected_product.planting_interval }}</td></tr>
+                        <tr><th>Weedicides</th><td>{{ selected_product.weedicides }}<br><small>{{ selected_product.weedicides_notes }}</small></td></tr>
+                        <tr><th>Pesticides</th><td>{{ selected_product.pesticides }}<br><small>{{ selected_product.pesticides_notes }}</small></td></tr>
+                        <tr><th>Fertilizers</th><td>{{ selected_product.fertilizers }}<br><small>{{ selected_product.fertilizers_notes }}</small></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if total_cost %}
+            <div class="alert alert-success mt-4">
+                <h2>Livestock Calculation Results:</h2>
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr><th>Animal Type</th><td>{{ animal_type }}</td></tr>
+                        <tr><th>Quantity</th><td>{{ quantity }}</td></tr>
+                        <tr><th>Housing Requirement</th><td>{{ housing_requirement }}</td></tr>
+                        <tr><th>Feed Requirement</th><td>{{ feed_requirement }} kg/month</td></tr>
+                        <tr><th>Average Weight</th><td>{{ animal_data.average_weight }} kg</td></tr>
+                        <tr><th>Recommended Feed</th><td>{{ animal_data.recommended_feed }}</td></tr>
+                        <tr><th>Vaccination Schedule</th><td>{{ vaccination_schedule }}</td></tr>
+                        <tr><th>Estimated Cost</th><td>GHs{{ "%.2f"|format(total_cost) }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if total_price and total_cost %}
+            <div class="alert alert-success mt-4">
+                <h2>Combined Results:</h2>
+                <h3>Crop Calculation Results:</h3>
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr><th>Hectares</th><td>{{ hectares }}</td></tr>
+                        <tr><th>Product</th><td>{{ selected_product.name }}</td></tr>
+                        <tr><th>Total Seedlings</th><td>{{ total_seedlings }}</td></tr>
+                        <tr><th>Total Price</th><td>GHs{{ "%.2f"|format(total_price) }}</td></tr>
+                        <tr><th>Planting Interval</th><td>{{ selected_product.planting_interval }}</td></tr>
+                        <tr><th>Weedicides</th><td>{{ selected_product.weedicides }}<br><small>{{ selected_product.weedicides_notes }}</small></td></tr>
+                        <tr><th>Pesticides</th><td>{{ selected_product.pesticides }}<br><small>{{ selected_product.pesticides_notes }}</small></td></tr>
+                        <tr><th>Fertilizers</th><td>{{ selected_product.fertilizers }}<br><small>{{ selected_product.fertilizers_notes }}</small></td></tr>
+                    </tbody>
+                </table>
+
+                <h3>Livestock Calculation Results:</h3>
+                <table class="table table-bordered mt-3">
+                    <tbody>
+                        <tr><th>Animal Type</th><td>{{ animal_type }}</td></tr>
+                        <tr><th>Quantity</th><td>{{ quantity }}</td></tr>
+                        <tr><th>Housing Requirement</th><td>{{ animal_data.housing_requirement }}</td></tr>
+                        <tr><th>Feed Requirement</th><td>{{ animal_data.feed_requirement }} kg/month</td></tr>
+                        <tr><th>Average Weight</th><td>{{ animal_data.average_weight }} kg</td></tr>
+                        <tr><th>Recommended Feed</th><td>{{ animal_data.recommended_feed }}</td></tr>
+                        <tr><th>Vaccination Schedule</th><td>{{ vaccination_schedule }}</td></tr>
+                        <tr><th>Estimated Cost</th><td>GHs{{ "%.2f"|format(total_cost) }}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock body %}

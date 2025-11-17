@@ -1,0 +1,86 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Submit Complaint</title>  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
+</head>  
+<body>  
+<div class="container mt-5">  
+    <h2>Submit a Complaint</h2>  
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category == 'success' and 'success' or 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          {% if category == 'success' %}
+            <script>
+              setTimeout(() => {
+                window.location.href = '{{ url_for("agroproducts") }}';
+              }, 2000); // Redirect after 2 seconds
+            </script>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('complaint', product_id=product.pid) }}">  
+        <div class="form-group">  
+            <label for="username">Your Name</label>  
+            <input type="text" class="form-control" id="username" name="username"   
+                   value="{{ current_user.username }}" readonly required>  
+        </div>  
+
+        <div class="form-group">  
+            <label for="supplier_name">Supplier Name</label>  
+            <input type="text" class="form-control" id="supplier_name" name="supplier_name"   
+                   value="{{ product.username }}" readonly>  
+        </div>  
+
+        <div class="form-group">  
+            <label for="supplier_phone">Supplier Phone Number</label>  
+            <input type="text" class="form-control" id="supplier_phone" name="supplier_phone"   
+                   value="{{ product.phone }}" readonly>  
+        </div>  
+
+        <div class="form-group">  
+            <label for="product_name">Product Name</label>  
+            <input type="text" class="form-control" id="product_name" name="product_name"   
+                   value="{{ product.productname }}" readonly>  
+        </div>  
+
+        <div class="form-group">
+          <label for="supplierRating">Rate Supplier:</label>  
+            <select id="supplierRating" class="form-control" name="supplierRating" required>  
+                <option value="" disabled selected>Select a rating</option>  
+                <option value="1">1</option>  
+                <option value="2">2</option>  
+                <option value="3">3</option>  
+                <option value="4">4</option>  
+                <option value="5">5</option>  
+            </select> 
+        </div>
+
+        <div class="form-group">  
+            <label for="complaint_text">Complaint Details</label>  
+            <textarea class="form-control" id="complaint_text" name="complaint_text" rows="5" required></textarea>  
+        </div>  
+
+        <button type="submit" class="btn btn-primary">Submit Complaint</button>  
+        <a href="{{ url_for('agroproducts') }}" class="btn btn-secondary">Cancel</a>  
+    </form>  
+</div>  
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>  
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"></script>  
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+</body>  
+</html>

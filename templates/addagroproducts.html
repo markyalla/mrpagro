@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}
+Add Agro Products
+{% endblock title %}
+
+{% block addagroproducts %}menu-active{% endblock addagroproducts %}
+
+{% block body %}
+<div class="container">
+  <h3 class="text-center my-4"><span>Add Agro Products</span></h3>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+      <form action="/addagroproducts" method="post" enctype="multipart/form-data">
+        <div class="form-group mb-3">
+          <label for="username">Farmer Name</label>
+          <input type="text" class="form-control" name="username" value="{{ current_user.username }}" id="username" required readonly>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="email">Farmer Email</label>
+          <input type="email" class="form-control" name="email" value="{{ current_user.email }}" id="email" required readonly>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="phone">Farmer Phone</label>
+          <input type="tel" class="form-control" name="phone" value="{{ current_user.phone }}" id="phone" required>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="productname">Product Name</label>
+          <input type="text" class="form-control" name="productname" id="productname" required>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="productdesc">Product Description</label>
+          <textarea class="form-control" name="productdesc" id="productdesc" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="product_picture">Product Picture</label>
+          <input type="file" class="form-control" name="product_picture" id="product_picture" accept="image/*" required>
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="price">Price</label>
+          <input type="number" class="form-control" name="price" id="price" step="0.01" required>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-block w-100">Add Product</button>
+      </form>
+    </div>
+    <div class="col-md-4"></div>
+  </div>
+</div>
+{% endblock body %}

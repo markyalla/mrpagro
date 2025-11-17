@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% block title %}
+Home - Material Requirement Planning
+{% endblock title %}
+{% block home %}
+menu-active
+{% endblock home %}
+
+{% block body %}
+
+<style>
+/* BLACK BACKGROUND FOR MISSION & VISION */
+#about .card {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+#about .card h4 {
+  color: #fff !important;
+}
+#about .card p {
+  color: #fff !important;
+}
+</style>
+
+<!-- ======= About MRP System Section ======= -->
+<section id="about-mrp" class="section-with-bg">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header">
+      <h2>About MRP System</h2>
+      <p>Material Requirement Planning for Modern Agriculture</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <p class="lead text-center mb-4">
+          Our Material Requirement Planning (MRP) system is designed specifically for agribusiness, 
+          helping farmers and agricultural entrepreneurs optimize their farming operations through 
+          data-driven decision making and efficient resource planning.
+        </p>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <i class="fa fa-calculator fa-3x mb-3 text-primary"></i>
+            <h4>Bill of Materials</h4>
+            <p>Calculate exact requirements for crops and livestock including seedlings, feed, fertilizers, and more.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <i class="fa fa-leaf fa-3x mb-3 text-success"></i>
+            <h4>Product Management</h4>
+            <p>Browse and manage agricultural products with detailed specifications and pricing information.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <i class="fa fa-users fa-3x mb-3 text-info"></i>
+            <h4>Community Forum</h4>
+            <p>Connect with fellow farmers, share experiences, and learn from the agricultural community.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= User Guide Section (FIXED ACCORDION) ======= -->
+<section id="user-guide">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header">
+      <h2>How to Use the MRP System</h2>
+      <p>A step-by-step guide to get you started</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <!-- ✅ BOOTSTRAP 5 ACCORDION - NOW WORKS! -->
+        <div class="accordion" id="guideAccordion">
+          
+          <!-- Step 1 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                <i class="fas fa-chevron-right me-2"></i> Step 1: Create an Account
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                <p><strong>Getting Started:</strong></p>
+                <ul>
+                  <li>Click on the "Signin" button in the navigation menu</li>
+                  <li>Fill in your username, email, and password</li>
+                  <li>Once registered, you can log in to access all features</li>
+                  <li>Your profile will be saved for future visits</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                <i class="fas fa-chevron-right me-2"></i> Step 2: Using the Bill of Materials (BOM)
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                <p><strong>For Crop Farming:</strong></p>
+                <ul>
+                  <li>Navigate to the "BOM" section from the menu</li>
+                  <li>Enter the number of hectares you plan to farm</li>
+                  <li>Select your desired crop from the dropdown menu</li>
+                  <li>Click "Calculate Crops" to see total seedlings, costs, and required inputs</li>
+                  <li>View recommendations for fertilizers, pesticides, and weedicides</li>
+                </ul>
+                <p><strong>For Livestock Farming:</strong></p>
+                <ul>
+                  <li>Select the animal type from the livestock calculator</li>
+                  <li>Enter the number of animals you want to raise</li>
+                  <li>Click "Calculate Livestock" to get housing, feed, and vaccination requirements</li>
+                  <li>Review estimated costs and planning details</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                <i class="fas fa-chevron-right me-2"></i> Step 3: Browse Agro Products
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                <p><strong>Finding Products:</strong></p>
+                <ul>
+                  <li>Click on "Agro Products" in the navigation menu</li>
+                  <li>Browse through available agricultural products</li>
+                  <li>View detailed information including prices and specifications</li>
+                  <li>Use the search feature or voice search to find specific products</li>
+                </ul>
+                <p><strong>Adding Products (for sellers):</strong></p>
+                <ul>
+                  <li>Navigate to "Add Products" section</li>
+                  <li>Fill in product details, pricing, and specifications</li>
+                  <li>Submit to make your products available to the community</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                <i class="fas fa-chevron-right me-2"></i> Step 4: Join the Community Forum
+              </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                <p><strong>Participating in Discussions:</strong></p>
+                <ul>
+                  <li>Go to "Community Forum" from the navigation</li>
+                  <li>Read existing discussions and comments from other farmers</li>
+                  <li>Click "Add Discussion" to start a new topic</li>
+                  <li>Share your experiences, ask questions, and get advice</li>
+                  <li>Comment on posts to engage with the community</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                <i class="fas fa-chevron-right me-2"></i> Step 5: Using Voice Search
+              </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#guideAccordion">
+              <div class="accordion-body">
+                <p><strong>Voice-Activated Search:</strong></p>
+                <ul>
+                  <li>Look for the "Voice Search" button in the navigation bar</li>
+                  <li>Click the button and speak your search query</li>
+                  <li>The system will automatically search for products matching your voice command</li>
+                  <li>Note: Voice search works best in Chrome and other modern browsers</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= About Us Section (BLACK BACKGROUND) ======= -->
+<section id="about" class="section-with-bg">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header">
+      <h2>About Us</h2>
+      <p>Learn more about our mission and values</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4><i class="fa fa-bullseye text-primary"></i> Our Mission</h4>
+            <p>To revolutionize agricultural planning in Africa by providing farmers with cutting-edge Material 
+            Requirement Planning tools that simplify complex farming decisions. We are committed to bridging the 
+            technology gap in agriculture, ensuring that both small-scale and commercial farmers have access to 
+            accurate resource calculations, cost estimates, and agricultural insights. Through our platform, we aim 
+            to reduce waste, optimize resource allocation, increase crop yields, and improve livestock management, 
+            ultimately contributing to food security and sustainable farming practices across the continent.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h4><i class="fa fa-eye text-success"></i> Our Vision</h4>
+            <p>To become Africa's premier digital agriculture platform, transforming how farmers plan, manage, and 
+            scale their agricultural operations. We envision a future where every farmer, regardless of their location 
+            or farm size, has access to professional-grade planning tools, real-time market information, and a supportive 
+            community of agricultural experts. By 2030, we aim to empower over 1 million farmers across Africa, 
+            contributing to a 40% increase in agricultural productivity, fostering innovation in agribusiness, and 
+            creating sustainable livelihoods that drive economic growth in rural communities while preserving our 
+            environment for future generations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= Testimonials Section ======= -->
+<section id="testimonials">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header">
+      <h2>Testimonials</h2>
+      <p>What our users say about us</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card testimonial-card h-100">
+          <div class="card-body text-center">
+            <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+            <p class="card-text">
+              This platform has transformed my agro business! The BOM calculator 
+              helped me plan my 5-hectare farm with precision.
+            </p>
+            <h5 class="card-title mt-3">John Doe</h5>
+            <p class="text-muted">Maize Farmer</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card testimonial-card h-100">
+          <div class="card-body text-center">
+            <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+            <p class="card-text">
+              Excellent service and support for farmers! The community forum 
+              connected me with experienced farmers who guided my livestock venture.
+            </p>
+            <h5 class="card-title mt-3">Jane Smith</h5>
+            <p class="text-muted">Poultry Farmer</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card testimonial-card h-100">
+          <div class="card-body text-center">
+            <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+            <p class="card-text">
+              A wonderful experience with great results! The cost estimates were 
+              accurate and helped me secure funding for my farming project.
+            </p>
+            <h5 class="card-title mt-3">Michael Brown</h5>
+            <p class="text-muted">Farming Consultant</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="section-bg">
+  <div class="container" data-aos="fade-up">
+    <div class="section-header">
+      <h2>Contact Us</h2>
+      <p>Feel free to reach out to us for any inquiries</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <form action="/contact" method="POST" role="form" class="php-email-form">
+          <div class="form-group">
+            <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" class="form-control" id="email" placeholder="Your Email" required>
+          </div>
+          <div class="form-group">
+            <textarea name="message" class="form-control" rows="5" placeholder="Message" required></textarea>
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary">Send Message</button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="contact-info">
+          <h4 class="mb-4">Contact Information</h4>
+          <div class="mb-3">
+            <p><i class="fa fa-envelope text-primary"></i> <strong></strong> bismarkasomani92@gmail.com</p>
+          </div>
+          <div class="mb-3">
+            <p><i class="fa fa-phone text-primary"></i> <strong></strong> +233 541512558</p>
+          </div>
+          <div class="mb-3">
+            <p><i class="fa fa-map-marker text-primary"></i> <strong></strong> kenkey factory road, Koforidua, Ghana</p>
+          </div>
+          <div class="mt-4">
+            <h5>Business Hours</h5>
+            <p>Monday - Friday: 8:00 AM - 5:00 PM<br>
+            Saturday: 9:00 AM - 2:00 PM<br>
+            Sunday: Closed</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= Footer ======= -->
+<footer id="footer">
+  <div class="footer-top">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+          <h4>About MRP</h4>
+          <p>Material Requirement Planning system for modern agriculture. Empowering farmers with data-driven insights.</p>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+          <h4>Quick Links</h4>
+          <ul class="list-unstyled">
+            <li><a href="/">Home</a></li>
+            <li><a href="/agroproducts">Agro Products</a></li>
+            <li><a href="/bom">BOM Calculator</a></li>
+            <li><a href="/forum">Community Forum</a></li>
+          </ul>
+        </div>
+        
+        <div class="col-lg-4 col-md-6 mb-4">
+          <h4>Connect With Us</h4>
+          <p>Stay updated with the latest in agricultural technology</p>
+          <div class="social-links">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="copyright">
+      &copy; <span id="currentYear"></span> <strong>MRP Agribusiness</strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+      Developed by <a href="https://designet.netlify.app" target="_blank">Designet</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Copyright year
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
+
+{% endblock body %}
